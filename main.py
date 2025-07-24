@@ -13,7 +13,7 @@ def conectar():
     print(f"Error: {error}")
     return None
 
-#EJEMPLO DE DAO PARA USAR EN EL FUTURO
+#EJEMPLO DE DAO PARA USAR EN EL FUTURO NOTA: Esto no lo he probado
 # class ProductoDAO:
 #   def __init__(self, conexion):
 #     self.conexion = conexion
