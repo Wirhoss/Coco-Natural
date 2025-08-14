@@ -1,0 +1,4 @@
+fastapi
+uvicorn[standard]
+cx_Oracle
+python-dotenv

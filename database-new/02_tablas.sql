@@ -179,8 +179,5 @@ create unique index ux_proveedor_email on
    );
 
 -- Otros arreglos:
-alter table pedido modify (
-   fecha_pedido timestamp default systimestamp not null
-);
 alter table producto add constraint chk_precio_nonneg check ( precio >= 0 );
 alter table pedido add constraint chk_total_nonneg check ( total >= 0 );

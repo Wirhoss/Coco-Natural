@@ -6,7 +6,7 @@ create or replace package pkg_utilidades as
   function fn_calcular_subtotal(p_cantidad in number, p_precio in number) return number;
   function fn_generar_codigo_pedido return varchar2;
 end pkg_utilidades;
-/
+
 create or replace package body pkg_utilidades as
   function fn_calcular_subtotal(p_cantidad in number, p_precio in number) return number is
   begin
@@ -28,4 +28,3 @@ create or replace package body pkg_utilidades as
     return null;
   end fn_generar_codigo_pedido;
 end pkg_utilidades;
-/

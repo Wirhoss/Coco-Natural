@@ -18,7 +18,7 @@ create or replace package pkg_movimiento as
   function cur_movimientos_invalidos return sys_refcursor;
   function fn_contar_movimientos_tipo(p_tipo in varchar2) return number;
 end pkg_movimiento;
-/
+
 create or replace package body pkg_movimiento as
   procedure insertar_movimiento(p_id_movimiento in movimientos.id_movimiento%type,
                                 p_tipo in movimientos.tipo%type,
@@ -80,4 +80,4 @@ create or replace package body pkg_movimiento as
     return null;
   end fn_contar_movimientos_tipo;
 end pkg_movimiento;
-/
+

@@ -20,7 +20,7 @@ create or replace package pkg_proveedor as
   function fn_contar_productos_proveedor(p_id_proveedor in proveedor.id_proveedor%type) return number;
   function cur_proveedores_con_stock_bajo return sys_refcursor;
 end pkg_proveedor;
-/
+
 create or replace package body pkg_proveedor as
   procedure insertar_proveedor(p_id_proveedor in proveedor.id_proveedor%type,
                                p_nombre      in proveedor.nombre%type,
@@ -84,4 +84,3 @@ create or replace package body pkg_proveedor as
     return rc;
   end cur_proveedores_con_stock_bajo;
 end pkg_proveedor;
-/

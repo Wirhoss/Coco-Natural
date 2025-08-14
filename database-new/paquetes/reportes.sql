@@ -11,7 +11,7 @@ create or replace package pkg_reportes as
   function cur_stock_por_categoria return sys_refcursor;
   function cur_productos_sin_movimientos(p_dias in number) return sys_refcursor;
 end pkg_reportes;
-/
+
 create or replace package body pkg_reportes as
   function cur_ventas_por_mes(p_anio in number) return sys_refcursor is
     rc sys_refcursor;
@@ -97,4 +97,3 @@ create or replace package body pkg_reportes as
     return rc;
   end cur_productos_sin_movimientos;
 end pkg_reportes;
-/

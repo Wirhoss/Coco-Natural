@@ -12,7 +12,7 @@ create or replace package pkg_categoria as
   procedure eliminar_categoria(p_id_categoria in categoria.id_categoria%type);
   function obtener_categorias return sys_refcursor;
 end pkg_categoria;
-/
+
 create or replace package body pkg_categoria as
   procedure insertar_categoria(p_id_categoria in categoria.id_categoria%type,
                               p_nombre       in categoria.nombre%type,
@@ -45,4 +45,4 @@ create or replace package body pkg_categoria as
     return c_categorias;
   end obtener_categorias;
 end pkg_categoria;
-/
+

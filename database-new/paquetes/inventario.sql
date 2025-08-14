@@ -14,7 +14,7 @@ create or replace package pkg_inventario as
   function fn_porcentaje_stock(p_id_producto in producto.id_producto%type) return number;
   procedure generar_alerta_stock;
 end pkg_inventario;
-/
+
 create or replace package body pkg_inventario as
   procedure actualizar_stock(p_id_producto in producto.id_producto%type,
                              p_cantidad in number,
@@ -82,4 +82,3 @@ create or replace package body pkg_inventario as
     commit;
   end generar_alerta_stock;
 end pkg_inventario;
-/

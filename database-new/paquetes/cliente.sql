@@ -19,7 +19,7 @@ create or replace package pkg_cliente as
   function fn_calcular_edad_cliente(p_id_cliente in cliente.id_cliente%type) return number;
   function cur_pedidos_por_cliente(p_id_cliente in cliente.id_cliente%type) return sys_refcursor;
 end pkg_cliente;
-/
+
 create or replace package body pkg_cliente as
   procedure insertar_cliente(p_nombre    in cliente.nombre%type,
                              p_telefono  in cliente.telefono%type,
@@ -100,4 +100,4 @@ create or replace package body pkg_cliente as
     return rc;
   end cur_pedidos_por_cliente;
 end pkg_cliente;
-/
+

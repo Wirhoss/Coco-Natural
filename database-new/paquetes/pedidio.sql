@@ -11,7 +11,7 @@ create or replace package pkg_pedido as
   function fn_total_compras_cliente(p_id_cliente in cliente.id_cliente%type) return number;
   function fn_dias_entrega_promedio(p_id_pedido in pedido.id_pedido%type) return number;
 end pkg_pedido;
-/
+
 create or replace package body pkg_pedido as
   procedure procesar_pedido(p_id_pedido in pedido.id_pedido%type) is
     cursor c_detalles is select id_producto, cantidad from detalle_pedido where id_pedido = p_id_pedido;
@@ -92,4 +92,3 @@ create or replace package body pkg_pedido as
     return null;
   end fn_dias_entrega_promedio;
 end pkg_pedido;
-/

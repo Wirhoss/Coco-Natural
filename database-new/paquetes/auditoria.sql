@@ -5,7 +5,7 @@
 create or replace package pkg_auditoria as
   function cur_auditoria_cambios(p_days_back in number) return sys_refcursor;
 end pkg_auditoria;
-/
+
 create or replace package body pkg_auditoria as
   function cur_auditoria_cambios(p_days_back in number) return sys_refcursor is
     rc sys_refcursor;
@@ -19,4 +19,4 @@ create or replace package body pkg_auditoria as
     return rc;
   end cur_auditoria_cambios;
 end pkg_auditoria;
-/
+

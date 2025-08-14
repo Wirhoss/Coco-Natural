@@ -27,7 +27,7 @@ create or replace package pkg_producto as
   function cur_productos_por_categoria(p_id_categoria in categoria.id_categoria%type) return sys_refcursor;
   function cur_productos_sin_movimientos(p_dias in number) return sys_refcursor;
 end pkg_producto;
-/
+
 create or replace package body pkg_producto as
   procedure insertar_producto(p_id_producto in producto.id_producto%type,
                               p_nombre       in producto.nombre%type,
@@ -107,4 +107,4 @@ create or replace package body pkg_producto as
     return rc;
   end cur_productos_sin_movimientos;
 end pkg_producto;
-/
+

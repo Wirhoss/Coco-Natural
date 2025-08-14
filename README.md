@@ -4,6 +4,7 @@ Para instalar los paquetes necesarios en python:
 2. pip install -r /path/to/requirements.txt
 
 
+
 Lista de cosas por hacer:
 25 Procedimientos Almacenados
 
