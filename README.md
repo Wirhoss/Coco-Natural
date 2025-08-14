@@ -49,7 +49,7 @@ Reportes Críticos:
   vw_total_ventas_categoria (CATEGORIA + ventas totales)
   vw_detalle_pedidos (PEDIDO + DETALLE + CLIENTE)
 
-15 Funciones
+15 Funciones FALTA
 Cálculos y Validaciones:
   fn_calcular_subtotal (cantidad * precio)
   fn_stock_disponible (PRODUCTO)
@@ -67,8 +67,7 @@ Cálculos y Validaciones:
   fn_contar_movimientos_tipo (MOVIMIENTOS: "entrada"/"salida")
   fn_total_compras_cliente (CLIENTE)
 
-10 Paquetes
-
+10 Paquetes FALTA
 Agrupación Lógica:
   pkg_productos (CRUD + stock)
   pkg_inventario (movimientos + alertas)
