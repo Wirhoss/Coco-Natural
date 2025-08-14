@@ -57,9 +57,9 @@ create or replace package body pkg_movimiento as
    ) is
    begin
       update movimientos
-         set tipo = p_tipo,
-             cantidad = p_cantidad,
-             id_producto = p_id_producto
+         set tipo = nvl(nullif(p_tipo,   ''), tipo),
+             cantidad = nvl(nullif(p_cantidad,   ''), cantidad),
+             id_producto = nvl(nullif(p_id_producto,   ''), id_producto)
        where id_movimiento = p_id_movimiento;
       commit;
    end actualizar_movimiento;

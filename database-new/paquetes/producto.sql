@@ -86,13 +86,13 @@ create or replace package body pkg_producto as
    ) is
    begin
       update producto
-         set nombre = p_nombre,
-             descripcion = p_descripcion,
-             precio = p_precio,
-             stock_minimo = p_stock_minimo,
-             stock_actual = p_stock_actual,
-             id_categoria = p_id_categoria,
-             id_proveedor = p_id_proveedor
+         set nombre = nvl(nullif(p_nombre,   ''), nombre),
+             descripcion = nvl(nullif(p_descripcion,   ''), descripcion),
+             precio = nvl(nullif(p_precio,   ''), precio),
+             stock_minimo = nvl(nullif(p_stock_minimo,   ''), stock_minimo),
+             stock_actual = nvl(nullif(p_stock_actual,   ''), stock_actual),
+             id_categoria = nvl(nullif(p_id_categoria,   ''), id_categoria),
+             id_proveedor = nvl(nullif(p_id_proveedor,   ''), id_proveedor)
        where id_producto = p_id_producto;
       commit;
    end actualizar_producto;

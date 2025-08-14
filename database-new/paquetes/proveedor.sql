@@ -65,10 +65,10 @@ create or replace package body pkg_proveedor as
    ) is
    begin
       update proveedor
-         set nombre = p_nombre,
-             telefono = p_telefono,
-             email = p_email,
-             direccion = p_direccion
+         set nombre = nvl(nullif(p_nombre,   ''), nombre),
+             telefono = nvl(nullif(telefono,   ''), p_telefono),
+             email = nvl(nullif(p_email,   ''), email),
+             direccion = nvl(nullif(p_direccion,   ''), direccion)
        where id_proveedor = p_id_proveedor;
       commit;
    end actualizar_proveedor;

@@ -43,8 +43,8 @@ create or replace package body pkg_categoria as
    ) is
    begin
       update categoria
-         set nombre = p_nombre,
-             descripcion = p_descripcion
+         set nombre = nvl(nullif(p_nombre,   ''), nombre),
+             descripcion = nvl(nullif(p_descripcion,   ''), descripcion)
        where id_categoria = p_id_categoria;
       commit;
    end actualizar_categoria;

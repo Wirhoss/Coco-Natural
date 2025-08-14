@@ -67,10 +67,12 @@ create or replace package body pkg_cliente as
    ) is
    begin
       update cliente
-         set nombre = p_nombre,
-             telefono = p_telefono,
-             email = p_email,
-             direccion = p_direccion
+         set nombre             = nvl(nullif(p_nombre,   ''), nombre),
+           telefono             = nvl(nullif(p_telefono, ''), telefono),
+           email                = nvl(nullif(p_email,    ''), email),
+           direccion            = nvl(nullif(p_direccion,''), direccion),
+           fecha_modificacion   = systimestamp,
+           usuario_modificacion = user
        where id_cliente = p_id;
       commit;
    end actualizar_cliente;
