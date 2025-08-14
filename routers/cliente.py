@@ -7,18 +7,16 @@ router = APIRouter(prefix="/cliente", tags=["cliente"])
 @router.get("/", summary="List clients")
 def list_clientes(conn=Depends(get_db)):
     cur = conn.cursor()
+    result_cursor = None 
     try:
-        cur.callproc("pkg_cliente.obtener_clientes", [cur])
-        # When procedure returns via OUT cursor param, procedure was defined that way in original; in our package we used a procedure with OUT param
-        # But to keep compatibility if it was function returning cursor, fallback to callfunc
-        try:
-            data = rows_to_dicts(cur)
-            return data
-        except Exception:
-            # fallback assuming function
-            ref = cur.callfunc("pkg_cliente.cur_pedidos_por_cliente", oracledb.CURSOR, [0])
-            return rows_to_dicts(ref)
+        out_cursor = cur.var(oracledb.DB_TYPE_CURSOR)
+        cur.callproc("pkg_cliente.obtener_clientes", [out_cursor])
+        result_cursor = out_cursor.getvalue()
+        data = rows_to_dicts(result_cursor)
+        return data
     finally:
+        if result_cursor:
+            result_cursor.close()
         cur.close()
 
 @router.post("/", summary="Create client")
