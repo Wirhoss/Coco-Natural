@@ -2,183 +2,169 @@
 -- Package: pkg_producto
 -- Contiene: procedimientos y funciones para la tabla PRODUCTO
 
-create or replace package pkg_producto as
-   procedure insertar_producto (
-      p_nombre       in producto.nombre%type,
-      p_descripcion  in producto.descripcion%type,
-      p_precio       in producto.precio%type,
-      p_stock_minimo in producto.stock_minimo%type,
-      p_stock_actual in producto.stock_actual%type,
-      p_id_categoria in producto.id_categoria%type,
-      p_id_proveedor in producto.id_proveedor%type,
-      p_usuario      in producto.usuario_creacion%type default user
+CREATE OR REPLACE PACKAGE pkg_producto AS
+   PROCEDURE insertar_producto (
+      p_nombre       IN producto.nombre%TYPE,
+      p_descripcion  IN producto.descripcion%TYPE,
+      p_precio       IN producto.precio%TYPE,
+      p_stock_minimo IN producto.stock_minimo%TYPE,
+      p_stock_actual IN producto.stock_actual%TYPE,
+      p_id_categoria IN producto.id_categoria%TYPE,
+      p_id_proveedor IN producto.id_proveedor%TYPE,
+      p_usuario      IN producto.usuario_creacion%TYPE DEFAULT USER
    );
-   procedure actualizar_producto (
-      p_id_producto  in producto.id_producto%type,
-      p_nombre       in producto.nombre%type,
-      p_descripcion  in producto.descripcion%type,
-      p_precio       in producto.precio%type,
-      p_stock_minimo in producto.stock_minimo%type,
-      p_stock_actual in producto.stock_actual%type,
-      p_id_categoria in producto.id_categoria%type,
-      p_id_proveedor in producto.id_proveedor%type
+
+   PROCEDURE actualizar_producto (
+      p_id_producto  IN producto.id_producto%TYPE,
+      p_nombre       IN producto.nombre%TYPE,
+      p_descripcion  IN producto.descripcion%TYPE,
+      p_precio       IN producto.precio%TYPE,
+      p_stock_minimo IN producto.stock_minimo%TYPE,
+      p_stock_actual IN producto.stock_actual%TYPE,
+      p_id_categoria IN producto.id_categoria%TYPE,
+      p_id_proveedor IN producto.id_proveedor%TYPE
    );
-   procedure eliminar_producto (
-      p_id_producto in producto.id_producto%type
+
+   PROCEDURE eliminar_producto (
+      p_id_producto IN producto.id_producto%TYPE
    );
-   function obtener_productos return sys_refcursor;
 
-   function fn_obtener_nombre_producto (
-      p_id_producto in producto.id_producto%type
-   ) return varchar2;
-   function fn_precio_promedio_categoria (
-      p_id_categoria in categoria.id_categoria%type
-   ) return number;
-   function cur_productos_por_categoria (
-      p_id_categoria in categoria.id_categoria%type
-   ) return sys_refcursor;
-   function cur_productos_sin_movimientos (
-      p_dias in number
-   ) return sys_refcursor;
-end pkg_producto;
+   FUNCTION obtener_productos RETURN SYS_REFCURSOR;
 
-create or replace package body pkg_producto as
-   procedure insertar_producto (
-      p_nombre       in producto.nombre%type,
-      p_descripcion  in producto.descripcion%type,
-      p_precio       in producto.precio%type,
-      p_stock_minimo in producto.stock_minimo%type,
-      p_stock_actual in producto.stock_actual%type,
-      p_id_categoria in producto.id_categoria%type,
-      p_id_proveedor in producto.id_proveedor%type,
-      p_usuario      in producto.usuario_creacion%type
-   ) is
-   begin
-      insert into producto (
-         nombre,
-         descripcion,
-         precio,
-         stock_minimo,
-         stock_actual,
-         id_categoria,
-         id_proveedor,
-         usuario_creacion
-      ) values ( p_nombre,
-                 p_descripcion,
-                 p_precio,
-                 p_stock_minimo,
-                 p_stock_actual,
-                 p_id_categoria,
-                 p_id_proveedor,
-                 p_usuario );
-    -- commit;
-   end insertar_producto;
+   FUNCTION fn_obtener_nombre_producto (
+      p_id_producto IN producto.id_producto%TYPE
+   ) RETURN VARCHAR2;
 
-   procedure actualizar_producto (
-      p_id_producto  in producto.id_producto%type,
-      p_nombre       in producto.nombre%type,
-      p_descripcion  in producto.descripcion%type,
-      p_precio       in producto.precio%type,
-      p_stock_minimo in producto.stock_minimo%type,
-      p_stock_actual in producto.stock_actual%type,
-      p_id_categoria in producto.id_categoria%type,
-      p_id_proveedor in producto.id_proveedor%type
-   ) is
-   begin
-      update producto
-         set nombre = nvl(nullif(p_nombre,   ''), nombre),
-             descripcion = nvl(nullif(p_descripcion,   ''), descripcion),
-             precio = nvl(nullif(p_precio,   ''), precio),
-             stock_minimo = nvl(nullif(p_stock_minimo,   ''), stock_minimo),
-             stock_actual = nvl(nullif(p_stock_actual,   ''), stock_actual),
-             id_categoria = nvl(nullif(p_id_categoria,   ''), id_categoria),
-             id_proveedor = nvl(nullif(p_id_proveedor,   ''), id_proveedor)
-       where id_producto = p_id_producto;
-      commit;
-   end actualizar_producto;
+   FUNCTION fn_precio_promedio_categoria (
+      p_id_categoria IN categoria.id_categoria%TYPE
+   ) RETURN NUMBER;
 
-   procedure eliminar_producto (
-      p_id_producto in producto.id_producto%type
-   ) is
-   begin
-      delete from producto
-       where id_producto = p_id_producto;
-      commit;
-   end eliminar_producto;
+   FUNCTION cur_productos_por_categoria (
+      p_id_categoria IN categoria.id_categoria%TYPE
+   ) RETURN SYS_REFCURSOR;
 
-   function obtener_productos return sys_refcursor is
-      c_productos sys_refcursor;
-   begin
-      open c_productos for select *
-                             from producto;
-      return c_productos;
-   end obtener_productos;
+   FUNCTION cur_productos_sin_movimientos (
+      p_dias IN NUMBER
+   ) RETURN SYS_REFCURSOR;
+END pkg_producto;
 
-   function fn_obtener_nombre_producto (
-      p_id_producto in producto.id_producto%type
-   ) return varchar2 is
-      v_nombre varchar2(4000);
-   begin
-      select nombre
-        into v_nombre
-        from producto
-       where id_producto = p_id_producto;
-      return v_nombre;
-   exception
-      when no_data_found then
-         return null;
-   end fn_obtener_nombre_producto;
-
-   function fn_precio_promedio_categoria (
-      p_id_categoria in categoria.id_categoria%type
-   ) return number is
-      v_prom number;
-   begin
-      select nvl(
-         avg(precio),
-         0
-      )
-        into v_prom
-        from producto
-       where id_categoria = p_id_categoria;
-      return v_prom;
-   exception
-      when no_data_found then
-         return null;
-   end fn_precio_promedio_categoria;
-
-   function cur_productos_por_categoria (
-      p_id_categoria in categoria.id_categoria%type
-   ) return sys_refcursor is
-      rc sys_refcursor;
-   begin
-      open rc for select p.*
-                                from producto p
-                   where p.id_categoria = p_id_categoria;
-      return rc;
-   end cur_productos_por_categoria;
-
-   function cur_productos_sin_movimientos (
-      p_dias in number
-   ) return sys_refcursor is
-      rc       sys_refcursor;
-      v_cutoff timestamp := systimestamp - numtodsinterval(
-         nvl(
-            p_dias,
-            30
-         ),
-         'DAY'
+CREATE OR REPLACE PACKAGE BODY pkg_producto AS
+   PROCEDURE insertar_producto (
+      p_nombre       IN producto.nombre%TYPE,
+      p_descripcion  IN producto.descripcion%TYPE,
+      p_precio       IN producto.precio%TYPE,
+      p_stock_minimo IN producto.stock_minimo%TYPE,
+      p_stock_actual IN producto.stock_actual%TYPE,
+      p_id_categoria IN producto.id_categoria%TYPE,
+      p_id_proveedor IN producto.id_proveedor%TYPE,
+      p_usuario      IN producto.usuario_creacion%TYPE
+   ) IS
+   BEGIN
+      INSERT INTO producto (
+         nombre, descripcion, precio, stock_minimo, stock_actual,
+         id_categoria, id_proveedor, usuario_creacion
+      ) VALUES (
+         p_nombre, p_descripcion, p_precio, p_stock_minimo, p_stock_actual,
+         p_id_categoria, p_id_proveedor, p_usuario
       );
-   begin
-      open rc for select p.*
-                                from producto p
-                   where not exists (
-                     select 1
-                       from movimientos m
-                      where m.id_producto = p.id_producto
-                        and m.fecha >= v_cutoff
-                  )
-                   order by p.nombre;
-      return rc;
-   end cur_productos_sin_movimientos;
-end pkg_producto;
+   END insertar_producto;
+
+   PROCEDURE actualizar_producto (
+      p_id_producto  IN producto.id_producto%TYPE,
+      p_nombre       IN producto.nombre%TYPE,
+      p_descripcion  IN producto.descripcion%TYPE,
+      p_precio       IN producto.precio%TYPE,
+      p_stock_minimo IN producto.stock_minimo%TYPE,
+      p_stock_actual IN producto.stock_actual%TYPE,
+      p_id_categoria IN producto.id_categoria%TYPE,
+      p_id_proveedor IN producto.id_proveedor%TYPE
+   ) IS
+   BEGIN
+      UPDATE producto
+         SET nombre       = COALESCE(p_nombre,       nombre),
+             descripcion  = COALESCE(p_descripcion,  descripcion),
+             precio       = COALESCE(p_precio,       precio),
+             stock_minimo = COALESCE(p_stock_minimo, stock_minimo),
+             stock_actual = COALESCE(p_stock_actual, stock_actual),
+             id_categoria = COALESCE(p_id_categoria, id_categoria),
+             id_proveedor = COALESCE(p_id_proveedor, id_proveedor)
+       WHERE id_producto = p_id_producto;
+      -- Sin COMMIT aquí.
+   END actualizar_producto;
+
+   PROCEDURE eliminar_producto (
+      p_id_producto IN producto.id_producto%TYPE
+   ) IS
+   BEGIN
+      DELETE FROM producto
+       WHERE id_producto = p_id_producto;
+      -- Sin COMMIT aquí.
+   END eliminar_producto;
+
+   FUNCTION obtener_productos RETURN SYS_REFCURSOR IS
+      c_productos SYS_REFCURSOR;
+   BEGIN
+      OPEN c_productos FOR
+         SELECT *
+           FROM producto;
+      RETURN c_productos;
+   END obtener_productos;
+
+   FUNCTION fn_obtener_nombre_producto (
+      p_id_producto IN producto.id_producto%TYPE
+   ) RETURN VARCHAR2 IS
+      v_nombre VARCHAR2(4000);
+   BEGIN
+      SELECT nombre
+        INTO v_nombre
+        FROM producto
+       WHERE id_producto = p_id_producto;
+      RETURN v_nombre;
+   EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+         RETURN NULL;
+   END fn_obtener_nombre_producto;
+
+   FUNCTION fn_precio_promedio_categoria (
+      p_id_categoria IN categoria.id_categoria%TYPE
+   ) RETURN NUMBER IS
+      v_prom NUMBER;
+   BEGIN
+      SELECT NVL(AVG(precio), 0)
+        INTO v_prom
+        FROM producto
+       WHERE id_categoria = p_id_categoria;
+      RETURN v_prom;
+   END fn_precio_promedio_categoria;
+
+   FUNCTION cur_productos_por_categoria (
+      p_id_categoria IN categoria.id_categoria%TYPE
+   ) RETURN SYS_REFCURSOR IS
+      rc SYS_REFCURSOR;
+   BEGIN
+      OPEN rc FOR
+         SELECT p.*
+           FROM producto p
+          WHERE p.id_categoria = p_id_categoria;
+      RETURN rc;
+   END cur_productos_por_categoria;
+
+   FUNCTION cur_productos_sin_movimientos (
+      p_dias IN NUMBER
+   ) RETURN SYS_REFCURSOR IS
+      rc       SYS_REFCURSOR;
+      v_cutoff TIMESTAMP := SYSTIMESTAMP - NUMTODSINTERVAL(NVL(p_dias, 30), 'DAY');
+   BEGIN
+      OPEN rc FOR
+         SELECT p.*
+           FROM producto p
+          WHERE NOT EXISTS (
+                   SELECT 1
+                     FROM movimientos m
+                    WHERE m.id_producto = p.id_producto
+                      AND m.fecha >= v_cutoff
+                )
+          ORDER BY p.nombre;
+      RETURN rc;
+   END cur_productos_sin_movimientos;
+END pkg_producto;

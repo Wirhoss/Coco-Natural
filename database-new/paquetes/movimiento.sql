@@ -2,129 +2,140 @@
 -- Package: pkg_movimiento
 -- Contiene: procedimientos y funciones para la tabla MOVIMIENTOS
 
-create or replace package pkg_movimiento as
-   procedure insertar_movimiento (
-      p_tipo        in movimientos.tipo%type,
-      p_cantidad    in movimientos.cantidad%type,
-      p_id_producto in movimientos.id_producto%type,
-      p_usuario     in movimientos.usuario_creacion%type default user
+CREATE OR REPLACE PACKAGE pkg_movimiento AS
+   PROCEDURE insertar_movimiento (
+      p_tipo        IN movimientos.tipo%TYPE,
+      p_cantidad    IN movimientos.cantidad%TYPE,
+      p_id_producto IN movimientos.id_producto%TYPE,
+      p_usuario     IN movimientos.usuario_creacion%TYPE DEFAULT USER
    );
-   procedure actualizar_movimiento (
-      p_id_movimiento in movimientos.id_movimiento%type,
-      p_tipo          in movimientos.tipo%type,
-      p_cantidad      in movimientos.cantidad%type,
-      p_id_producto   in movimientos.id_producto%type
-   );
-   procedure eliminar_movimiento (
-      p_id_movimiento in movimientos.id_movimiento%type
-   );
-   function obtener_movimientos return sys_refcursor;
 
-   function cur_movimientos_por_producto (
-      p_id_producto in producto.id_producto%type
-   ) return sys_refcursor;
-   function cur_movimientos_invalidos return sys_refcursor;
-   function fn_contar_movimientos_tipo (
-      p_tipo in varchar2
-   ) return number;
-end pkg_movimiento;
+   PROCEDURE actualizar_movimiento (
+      p_id_movimiento IN movimientos.id_movimiento%TYPE,
+      p_tipo          IN movimientos.tipo%TYPE,
+      p_cantidad      IN movimientos.cantidad%TYPE,
+      p_id_producto   IN movimientos.id_producto%TYPE
+   );
 
-create or replace package body pkg_movimiento as
-   procedure insertar_movimiento (
-      p_tipo        in movimientos.tipo%type,
-      p_cantidad    in movimientos.cantidad%type,
-      p_id_producto in movimientos.id_producto%type,
-      p_usuario     in movimientos.usuario_creacion%type
-   ) is
-   begin
-      insert into movimientos (
+   PROCEDURE eliminar_movimiento (
+      p_id_movimiento IN movimientos.id_movimiento%TYPE
+   );
+
+   FUNCTION obtener_movimientos RETURN SYS_REFCURSOR;
+
+   FUNCTION cur_movimientos_por_producto (
+      p_id_producto IN producto.id_producto%TYPE
+   ) RETURN SYS_REFCURSOR;
+
+   FUNCTION cur_movimientos_invalidos RETURN SYS_REFCURSOR;
+
+   FUNCTION fn_contar_movimientos_tipo (
+      p_tipo IN VARCHAR2
+   ) RETURN NUMBER;
+END pkg_movimiento;
+
+CREATE OR REPLACE PACKAGE BODY pkg_movimiento AS
+   PROCEDURE insertar_movimiento (
+      p_tipo        IN movimientos.tipo%TYPE,
+      p_cantidad    IN movimientos.cantidad%TYPE,
+      p_id_producto IN movimientos.id_producto%TYPE,
+      p_usuario     IN movimientos.usuario_creacion%TYPE
+   ) IS
+   BEGIN
+      INSERT INTO movimientos (
          tipo,
          cantidad,
          id_producto,
          usuario_creacion
-      ) values ( p_tipo,
-                 p_cantidad,
-                 p_id_producto,
-                 p_usuario );
-    -- commit;
-   end insertar_movimiento;
-
-   procedure actualizar_movimiento (
-      p_id_movimiento in movements.id_movimiento%type,
-      p_tipo          in movements.tipo%type,
-      p_cantidad      in movements.cantidad%type,
-      p_id_producto   in movements.id_producto%type
-   ) is
-   begin
-      update movimientos
-         set tipo = nvl(nullif(p_tipo,   ''), tipo),
-             cantidad = nvl(nullif(p_cantidad,   ''), cantidad),
-             id_producto = nvl(nullif(p_id_producto,   ''), id_producto)
-       where id_movimiento = p_id_movimiento;
-      commit;
-   end actualizar_movimiento;
-
-   procedure eliminar_movimiento (
-      p_id_movimiento in movimientos.id_movimiento%type
-   ) is
-   begin
-      delete from movimientos
-       where id_movimiento = p_id_movimiento;
-      commit;
-   end eliminar_movimiento;
-
-   function obtener_movimientos return sys_refcursor is
-      c_movimientos sys_refcursor;
-   begin
-      open c_movimientos for select *
-                               from movimientos;
-      return c_movimientos;
-   end obtener_movimientos;
-
-   function cur_movimientos_por_producto (
-      p_id_producto in producto.id_producto%type
-   ) return sys_refcursor is
-      rc sys_refcursor;
-   begin
-      open rc for select m.*,
-                         p.nombre as producto_nombre,
-                         p.stock_actual
-                                from movimientos m
-                                join producto p
-                              on m.id_producto = p.id_producto
-                   where m.id_producto = p_id_producto
-                   order by m.fecha desc;
-      return rc;
-   end cur_movimientos_por_producto;
-
-   function cur_movimientos_invalidos return sys_refcursor is
-      rc sys_refcursor;
-   begin
-      open rc for select m.*,
-                         p.nombre as producto_nombre
-                                from movimientos m
-                                left join producto p
-                              on m.id_producto = p.id_producto
-                   where m.cantidad <= 0
-                   order by m.fecha desc;
-      return rc;
-   end cur_movimientos_invalidos;
-
-   function fn_contar_movimientos_tipo (
-      p_tipo in varchar2
-   ) return number is
-      v_count number;
-   begin
-      select count(*)
-        into v_count
-        from movimientos
-       where upper(tipo) = upper(nvl(
+      ) VALUES (
          p_tipo,
-         ' '
-      ));
-      return v_count;
-   exception
-      when others then
-         return null;
-   end fn_contar_movimientos_tipo;
-end pkg_movimiento;
+         p_cantidad,
+         p_id_producto,
+         p_usuario
+      );
+      -- No commit aquí: manejar transacción en la capa de aplicación
+   END insertar_movimiento;
+
+   PROCEDURE actualizar_movimiento (
+      p_id_movimiento IN movimientos.id_movimiento%TYPE,
+      p_tipo          IN movimientos.tipo%TYPE,
+      p_cantidad      IN movimientos.cantidad%TYPE,
+      p_id_producto   IN movimientos.id_producto%TYPE
+   ) IS
+   BEGIN
+      UPDATE movimientos
+         SET tipo        = COALESCE(NULLIF(p_tipo, ''), tipo),
+             cantidad    = COALESCE(p_cantidad, cantidad),
+             id_producto = COALESCE(p_id_producto, id_producto)
+       WHERE id_movimiento = p_id_movimiento;
+      -- No commit
+   END actualizar_movimiento;
+
+   PROCEDURE eliminar_movimiento (
+      p_id_movimiento IN movimientos.id_movimiento%TYPE
+   ) IS
+   BEGIN
+      DELETE FROM movimientos
+       WHERE id_movimiento = p_id_movimiento;
+      -- No commit
+   END eliminar_movimiento;
+
+   FUNCTION obtener_movimientos RETURN SYS_REFCURSOR IS
+      c_movimientos SYS_REFCURSOR;
+   BEGIN
+      OPEN c_movimientos FOR
+         SELECT * FROM movimientos;
+      RETURN c_movimientos;
+   END obtener_movimientos;
+
+   FUNCTION cur_movimientos_por_producto (
+      p_id_producto IN producto.id_producto%TYPE
+   ) RETURN SYS_REFCURSOR IS
+      rc SYS_REFCURSOR;
+   BEGIN
+      OPEN rc FOR
+         SELECT m.*,
+                p.nombre AS producto_nombre,
+                p.stock_actual
+           FROM movimientos m
+           JOIN producto p
+             ON m.id_producto = p.id_producto
+          WHERE m.id_producto = p_id_producto
+          ORDER BY m.fecha DESC;
+      RETURN rc;
+   END cur_movimientos_por_producto;
+
+   FUNCTION cur_movimientos_invalidos RETURN SYS_REFCURSOR IS
+      rc SYS_REFCURSOR;
+   BEGIN
+      OPEN rc FOR
+         SELECT m.*,
+                p.nombre AS producto_nombre
+           FROM movimientos m
+           LEFT JOIN producto p
+             ON m.id_producto = p.id_producto
+          WHERE m.cantidad <= 0
+          ORDER BY m.fecha DESC;
+      RETURN rc;
+   END cur_movimientos_invalidos;
+
+   FUNCTION fn_contar_movimientos_tipo (
+      p_tipo IN VARCHAR2
+   ) RETURN NUMBER IS
+      v_count NUMBER;
+   BEGIN
+      IF p_tipo IS NULL THEN
+         SELECT COUNT(*) INTO v_count FROM movimientos;
+      ELSE
+         SELECT COUNT(*)
+           INTO v_count
+           FROM movimientos
+          WHERE UPPER(tipo) = UPPER(p_tipo);
+      END IF;
+      RETURN v_count;
+   EXCEPTION
+      WHEN OTHERS THEN
+         -- si prefieres propagar el error, remueve este bloque
+         RETURN NULL;
+   END fn_contar_movimientos_tipo;
+END pkg_movimiento;
