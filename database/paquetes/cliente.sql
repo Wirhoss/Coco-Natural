@@ -55,7 +55,6 @@ create or replace package body pkg_cliente as
                  p_email,
                  p_direccion,
                  p_usuario );
-    -- commit;
    end insertar_cliente;
 
    procedure actualizar_cliente (
@@ -74,7 +73,6 @@ create or replace package body pkg_cliente as
            fecha_modificacion   = systimestamp,
            usuario_modificacion = user
        where id_cliente = p_id;
-      commit;
    end actualizar_cliente;
 
    procedure eliminar_cliente (
@@ -83,7 +81,6 @@ create or replace package body pkg_cliente as
    begin
       delete from cliente
        where id_cliente = p_id;
-      commit;
    end eliminar_cliente;
 
    procedure obtener_clientes (

@@ -33,7 +33,6 @@ create or replace package body pkg_categoria as
       ) values ( p_nombre,
                  p_descripcion,
                  p_usuario );
-    -- commit;
    end insertar_categoria;
 
    procedure actualizar_categoria (
@@ -43,10 +42,21 @@ create or replace package body pkg_categoria as
    ) is
    begin
       update categoria
-         set nombre = nvl(nullif(p_nombre,   ''), nombre),
-             descripcion = nvl(nullif(p_descripcion,   ''), descripcion)
+         set nombre = nvl(
+         nullif(
+            p_nombre,
+            ''
+         ),
+         nombre
+      ),
+             descripcion = nvl(
+                nullif(
+                   p_descripcion,
+                   ''
+                ),
+                descripcion
+             )
        where id_categoria = p_id_categoria;
-      commit;
    end actualizar_categoria;
 
    procedure eliminar_categoria (
@@ -55,7 +65,6 @@ create or replace package body pkg_categoria as
    begin
       delete from categoria
        where id_categoria = p_id_categoria;
-      commit;
    end eliminar_categoria;
 
    function obtener_categorias return sys_refcursor is

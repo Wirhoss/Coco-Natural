@@ -12,8 +12,6 @@ create or replace package pkg_pedido as
    function cur_detalle_pedido_completo (
       p_id_pedido in pedido.id_pedido%type
    ) return sys_refcursor;
-
-   function fn_generar_codigo_pedido return varchar2;
    function fn_total_compras_cliente (
       p_id_cliente in cliente.id_cliente%type
    ) return number;
@@ -54,7 +52,6 @@ create or replace package body pkg_pedido as
          set
          estado = 'completado'
        where id_pedido = p_id_pedido;
-    -- commit;
    end procesar_pedido;
 
    procedure calcular_total_pedido (
@@ -63,7 +60,7 @@ create or replace package body pkg_pedido as
       v_total pedido.total%type;
    begin
       select nvl(
-         sum(cantidad * precio),
+         subtotal,
          0
       )
         into v_total
@@ -103,51 +100,6 @@ create or replace package body pkg_pedido as
                    order by dp.id_detalle;
       return rc;
    end cur_detalle_pedido_completo;
-
-   function fn_generar_codigo_pedido return varchar2 is
-      v_exists number := 0;
-      v_seq    number;
-      v_codigo varchar2(100);
-   begin
-      select count(*)
-        into v_exists
-        from user_sequences
-       where sequence_name = 'SEQ_CODIGO_PEDIDO';
-      if v_exists > 0 then
-         execute immediate 'select seq_codigo_pedido.nextval from dual'
-           into v_seq;
-         v_codigo := 'P-'
-                     || to_char(
-            sysdate,
-            'YYYY'
-         )
-                     || '-'
-                     || lpad(
-            v_seq,
-            6,
-            '0'
-         );
-      else
-         v_codigo := 'P-'
-                     || to_char(
-            sysdate,
-            'YYYYMMDDHH24MISS'
-         )
-                     || '-'
-                     || substr(
-            dbms_random.string(
-               'X',
-               6
-            ),
-            1,
-            6
-         );
-      end if;
-      return v_codigo;
-   exception
-      when others then
-         return null;
-   end fn_generar_codigo_pedido;
 
    function fn_total_compras_cliente (
       p_id_cliente in cliente.id_cliente%type

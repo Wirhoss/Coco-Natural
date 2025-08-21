@@ -53,7 +53,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_movimiento AS
          p_id_producto,
          p_usuario
       );
-      -- No commit aquí: manejar transacción en la capa de aplicación
    END insertar_movimiento;
 
    PROCEDURE actualizar_movimiento (
@@ -68,7 +67,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_movimiento AS
              cantidad    = COALESCE(p_cantidad, cantidad),
              id_producto = COALESCE(p_id_producto, id_producto)
        WHERE id_movimiento = p_id_movimiento;
-      -- No commit
    END actualizar_movimiento;
 
    PROCEDURE eliminar_movimiento (
@@ -77,7 +75,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_movimiento AS
    BEGIN
       DELETE FROM movimientos
        WHERE id_movimiento = p_id_movimiento;
-      -- No commit
    END eliminar_movimiento;
 
    FUNCTION obtener_movimientos RETURN SYS_REFCURSOR IS
@@ -135,7 +132,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_movimiento AS
       RETURN v_count;
    EXCEPTION
       WHEN OTHERS THEN
-         -- si prefieres propagar el error, remueve este bloque
          RETURN NULL;
    END fn_contar_movimientos_tipo;
 END pkg_movimiento;

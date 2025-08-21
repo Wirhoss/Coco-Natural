@@ -1,10 +1,4 @@
 create or replace package pkg_inventario as
-   procedure actualizar_stock (
-      p_id_producto in producto.id_producto%type,
-      p_cantidad    in number,
-      p_tipo        in varchar2
-   );
-
    procedure registrar_entrada_inventario (
       p_id_producto  in producto.id_producto%type,
       p_cantidad     in number,
@@ -28,23 +22,6 @@ create or replace package pkg_inventario as
 end pkg_inventario;
 
 create or replace package body pkg_inventario as
-   procedure actualizar_stock (
-      p_id_producto in producto.id_producto%type,
-      p_cantidad    in number,
-      p_tipo        in varchar2
-   ) is
-   begin
-      if lower(nvl(p_tipo,' ')) = 'entrada' then
-         update producto
-            set stock_actual = stock_actual + nvl(p_cantidad,0)
-          where id_producto = p_id_producto;
-      elsif lower(nvl(p_tipo,' ')) = 'salida' then
-         update producto
-            set stock_actual = stock_actual - nvl(p_cantidad,0)
-          where id_producto = p_id_producto;
-      end if;
-   end actualizar_stock;
-
    procedure registrar_entrada_inventario (
       p_id_producto  in producto.id_producto%type,
       p_cantidad     in number,
@@ -56,10 +33,6 @@ create or replace package body pkg_inventario as
       ) values (
          'entrada', p_cantidad, p_id_producto, USER
       );
-
-      update producto
-         set stock_actual = stock_actual + nvl(p_cantidad,0)
-       where id_producto = p_id_producto;
 
    end registrar_entrada_inventario;
 

@@ -44,7 +44,6 @@ create or replace package body pkg_proveedor as
    begin
       insert into proveedor (nombre, telefono, email, direccion, usuario_creacion)
       values (p_nombre, p_telefono, p_email, p_direccion, p_usuario);
-      -- sin COMMIT
    end insertar_proveedor;
 
    procedure actualizar_proveedor (
@@ -61,13 +60,11 @@ create or replace package body pkg_proveedor as
              email     = nvl(nullif(p_email,     ''), email),
              direccion = nvl(nullif(p_direccion, ''), direccion)
        where id_proveedor = p_id_proveedor;
-      -- sin COMMIT
    end actualizar_proveedor;
 
    procedure eliminar_proveedor (p_id_proveedor in proveedor.id_proveedor%type) is
    begin
       delete from proveedor where id_proveedor = p_id_proveedor;
-      -- sin COMMIT
    end eliminar_proveedor;
 
    procedure obtener_proveedores (p_cursor out sys_refcursor) is

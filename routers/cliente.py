@@ -1,50 +1,56 @@
-from fastapi import APIRouter, Depends
+# routers/cliente.py
+from fastapi import APIRouter, Depends, Body
+from db import get_db
+from routers.common import call_proc_out_cursor, exec_named_proc_omit_defaults, call_proc, call_func_scalar
 import oracledb
-from db import get_db, rows_to_dicts
 
 router = APIRouter(prefix="/cliente", tags=["cliente"])
 
-@router.get("/", summary="List clients")
-def list_clientes(conn=Depends(get_db)):
-    cur = conn.cursor()
-    result_cursor = None 
-    try:
-        out_cursor = cur.var(oracledb.DB_TYPE_CURSOR)
-        cur.callproc("pkg_cliente.obtener_clientes", [out_cursor])
-        result_cursor = out_cursor.getvalue()
-        data = rows_to_dicts(result_cursor)
-        return data
-    finally:
-        if result_cursor:
-            result_cursor.close()
-        cur.close()
+@router.get("")
+def listar_clientes(conn=Depends(get_db)):
+    return call_proc_out_cursor(conn, "pkg_cliente.obtener_clientes", [])
 
-@router.post("/", summary="Create client")
-def create_cliente(payload: dict, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc("pkg_cliente.insertar_cliente", [payload.get('nombre'), payload.get('telefono'), payload.get('email'), payload.get('direccion')])
-        conn.commit()
-        return {"status":"created"}
-    finally:
-        cur.close()
+@router.post("")
+def crear_cliente(
+    nombre: str = Body(...),
+    telefono: str = Body(...),
+    email: str = Body(...),
+    direccion: str = Body(...),
+    conn=Depends(get_db)
+):
+    return exec_named_proc_omit_defaults(conn, "pkg_cliente", "insertar_cliente", {
+        "p_nombre": nombre,
+        "p_telefono": telefono,
+        "p_email": email,
+        "p_direccion": direccion
+    })
 
-@router.put("/{id}", summary="Update client")
-def update_cliente(id: int, payload: dict, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc("pkg_cliente.actualizar_cliente", [id, payload.get('nombre'), payload.get('telefono'), payload.get('email'), payload.get('direccion')])
-        conn.commit()
-        return {"status":"updated"}
-    finally:
-        cur.close()
+@router.put("/{id_cliente}")
+def actualizar_cliente(
+    id_cliente: int,
+    nombre: str | None = Body(None),
+    telefono: str | None = Body(None),
+    email: str | None = Body(None),
+    direccion: str | None = Body(None),
+    conn=Depends(get_db)
+):
+    args = [id_cliente, nombre, telefono, email, direccion]
+    return call_proc(conn, "pkg_cliente.actualizar_cliente", args)
 
-@router.delete("/{id}", summary="Delete client")
-def delete_cliente(id: int, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc("pkg_cliente.eliminar_cliente", [id])
-        conn.commit()
-        return {"status":"deleted"}
-    finally:
-        cur.close()
+@router.delete("/{id_cliente}")
+def eliminar_cliente(id_cliente: int, conn=Depends(get_db)):
+    return call_proc(conn, "pkg_cliente.eliminar_cliente", [id_cliente])
+
+@router.get("/{id_cliente}/pedidos")
+def pedidos_por_cliente(id_cliente: int, conn=Depends(get_db)):
+    return call_func_cursor(conn, "pkg_cliente.cur_pedidos_por_cliente", [id_cliente])
+
+@router.get("/{id_cliente}/pedidos/count")
+def contar_pedidos(id_cliente: int, conn=Depends(get_db)):
+    val = call_func_scalar(conn, "pkg_cliente.fn_contar_pedidos_cliente", oracledb.NUMBER, [id_cliente])
+    return {"id_cliente": id_cliente, "total_pedidos": int(val) if val is not None else None}
+
+@router.get("/{id_cliente}/edad")
+def edad_cliente(id_cliente: int, conn=Depends(get_db)):
+    val = call_func_scalar(conn, "pkg_cliente.fn_calcular_edad_cliente", oracledb.NUMBER, [id_cliente])
+    return {"id_cliente": id_cliente, "edad": int(val) if val is not None else None}

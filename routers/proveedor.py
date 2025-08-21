@@ -1,78 +1,54 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Body
+from db import get_db
+from routers.common import exec_named_proc_omit_defaults, call_proc, call_proc_out_cursor, call_func_cursor, call_func_scalar
 import oracledb
-from db import get_db, rows_to_dicts
 
 router = APIRouter(prefix="/proveedor", tags=["proveedor"])
 
-@router.get("/", summary="List proveedores")
-def list_proveedores(conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
+@router.get("")
+def listar(conn=Depends(get_db)):
+    return call_proc_out_cursor(conn, "pkg_proveedor.obtener_proveedores", [])
 
-        out_rc = cur.var(oracledb.CURSOR)
-        cur.callproc("pkg_proveedor.obtener_proveedores", [out_rc])
+@router.post("")
+def crear(
+    nombre: str = Body(...),
+    telefono: str | None = Body(None),
+    email: str = Body(...),
+    direccion: str = Body(...),
+    conn=Depends(get_db)
+):
+    return exec_named_proc_omit_defaults(conn, "pkg_proveedor", "insertar_proveedor", {
+        "p_nombre": nombre,
+        "p_telefono": telefono,
+        "p_email": email,
+        "p_direccion": direccion
+    })
 
-        db_rcur = out_rc.getvalue()
+@router.put("/{id_proveedor}")
+def actualizar(
+    id_proveedor: int,
+    nombre: str | None = Body(None),
+    telefono: str | None = Body(None),
+    email: str | None = Body(None),
+    direccion: str | None = Body(None),
+    conn=Depends(get_db)
+):
+    return call_proc(conn, "pkg_proveedor.actualizar_proveedor",
+                     [id_proveedor, nombre, telefono, email, direccion])
 
-        return rows_to_dicts(db_rcur)
+@router.delete("/{id_proveedor}")
+def eliminar(id_proveedor: int, conn=Depends(get_db)):
+    return call_proc(conn, "pkg_proveedor.eliminar_proveedor", [id_proveedor])
 
-    except oracledb.Error as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cur.close()
+@router.get("/{id_proveedor}/productos")
+def productos_proveedor(id_proveedor: int, conn=Depends(get_db)):
+    return call_func_cursor(conn, "pkg_proveedor.cur_productos_proveedor", [id_proveedor])
 
-@router.post("/", summary="Create proveedor")
-def create_proveedor(payload: dict, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc(
-            "pkg_proveedor.insertar_proveedor",
-            [
-                payload.get("nombre"),
-                payload.get("telefono"),
-                payload.get("email"),
-                payload.get("direccion"),
-            ],
-        )
-        conn.commit()
-        return {"status": "created"}
-    except oracledb.Error as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cur.close()
+@router.get("/{id_proveedor}/productos/count")
+def contar_productos(id_proveedor: int, conn=Depends(get_db)):
+    val = call_func_scalar(conn, "pkg_proveedor.fn_contar_productos_proveedor", oracledb.NUMBER, [id_proveedor])
+    return {"id_proveedor": id_proveedor, "total_productos": int(val) if val is not None else None}
 
-@router.put("/{id}", summary="Update proveedor")
-def update_proveedor(id: int, payload: dict, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc(
-            "pkg_proveedor.actualizar_proveedor",
-            [
-                id,
-                payload.get("nombre"),
-                payload.get("telefono"),
-                payload.get("email"),
-                payload.get("direccion"),
-            ],
-        )
-        conn.commit()
-        return {"status": "updated"}
-    except oracledb.Error as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cur.close()
-
-@router.delete("/{id}", summary="Delete proveedor")
-def delete_proveedor(id: int, conn=Depends(get_db)):
-    cur = conn.cursor()
-    try:
-        cur.callproc("pkg_proveedor.eliminar_proveedor", [id])
-        conn.commit()
-        return {"status": "deleted"}
-    except oracledb.Error as e:
-        conn.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        cur.close()
+@router.get("/stock-bajo")
+def proveedores_con_stock_bajo(conn=Depends(get_db)):
+    return call_func_cursor(conn, "pkg_proveedor.cur_proveedores_con_stock_bajo", [])

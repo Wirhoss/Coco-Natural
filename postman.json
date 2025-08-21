@@ -1,0 +1,271 @@
+{
+  "info": {
+    "_postman_id": "e3d9a2a8-0c7f-4e20-9f7a-coleccion-plsql-fastapi",
+    "name": "Oracle PL/SQL Packages API",
+    "description": "Colección de endpoints FastAPI que envuelven paquetes PL/SQL (inventario, pedidos, reportes, etc.)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Root & Health",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/",
+            "description": "Ping raíz"
+          }
+        },
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/health",
+            "description": "Health check + DB"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categoria",
+      "item": [
+        {
+          "name": "GET /categoria",
+          "request": { "method": "GET", "url": "{{base_url}}/categoria" }
+        },
+        {
+          "name": "POST /categoria",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/categoria",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Bebidas\",\n  \"descripcion\": \"Líquidos varios\"\n}"
+            },
+            "description": "Inserta categoría (usa DEFAULT USER en PL/SQL)"
+          }
+        },
+        {
+          "name": "PUT /categoria/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/categoria/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Bebidas frías\",\n  \"descripcion\": \"Refrigeradas\"\n}" }
+          }
+        },
+        {
+          "name": "DELETE /categoria/:id",
+          "request": { "method": "DELETE", "url": "{{base_url}}/categoria/1" }
+        }
+      ]
+    },
+    {
+      "name": "Cliente",
+      "item": [
+        { "name": "GET /cliente", "request": { "method": "GET", "url": "{{base_url}}/cliente" } },
+        {
+          "name": "POST /cliente",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/cliente",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Juan Perez\",\n  \"telefono\": \"+50688887777\",\n  \"email\": \"juan@example.com\",\n  \"direccion\": \"San José\"\n}" }
+          }
+        },
+        {
+          "name": "PUT /cliente/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/cliente/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"telefono\": \"+50688880000\"\n}" }
+          }
+        },
+        { "name": "DELETE /cliente/:id", "request": { "method": "DELETE", "url": "{{base_url}}/cliente/1" } },
+        { "name": "GET /cliente/:id/pedidos", "request": { "method": "GET", "url": "{{base_url}}/cliente/1/pedidos" } },
+        { "name": "GET /cliente/:id/pedidos/count", "request": { "method": "GET", "url": "{{base_url}}/cliente/1/pedidos/count" } },
+        { "name": "GET /cliente/:id/edad", "request": { "method": "GET", "url": "{{base_url}}/cliente/1/edad" } }
+      ]
+    },
+    {
+      "name": "Proveedor",
+      "item": [
+        { "name": "GET /proveedor", "request": { "method": "GET", "url": "{{base_url}}/proveedor" } },
+        {
+          "name": "POST /proveedor",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/proveedor",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Distribuidora Tica\",\n  \"telefono\": \"+50622223333\",\n  \"email\": \"ventas@dt.cr\",\n  \"direccion\": \"Heredia\"\n}" }
+          }
+        },
+        {
+          "name": "PUT /proveedor/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/proveedor/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"telefono\": \"+50622224444\"\n}" }
+          }
+        },
+        { "name": "DELETE /proveedor/:id", "request": { "method": "DELETE", "url": "{{base_url}}/proveedor/1" } },
+        { "name": "GET /proveedor/:id/productos", "request": { "method": "GET", "url": "{{base_url}}/proveedor/1/productos" } },
+        { "name": "GET /proveedor/:id/productos/count", "request": { "method": "GET", "url": "{{base_url}}/proveedor/1/productos/count" } },
+        { "name": "GET /proveedor/stock-bajo", "request": { "method": "GET", "url": "{{base_url}}/proveedor/stock-bajo" } }
+      ]
+    },
+    {
+      "name": "Producto",
+      "item": [
+        { "name": "GET /producto", "request": { "method": "GET", "url": "{{base_url}}/producto" } },
+        {
+          "name": "POST /producto",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/producto",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Agua 600ml\",\n  \"descripcion\": \"Botella PET\",\n  \"precio\": 650.0,\n  \"stock_minimo\": 10,\n  \"stock_actual\": 50,\n  \"id_categoria\": 1,\n  \"id_proveedor\": 1\n}"
+            }
+          },
+          "description": "Ojo: el backend envía NULL en p_usuario para que PL/SQL use DEFAULT USER."
+        },
+        {
+          "name": "PUT /producto/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/producto/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"precio\": 700.0,\n  \"stock_minimo\": 12\n}" }
+          }
+        },
+        { "name": "DELETE /producto/:id", "request": { "method": "DELETE", "url": "{{base_url}}/producto/1" } },
+        { "name": "GET /producto/:id/nombre", "request": { "method": "GET", "url": "{{base_url}}/producto/1/nombre" } },
+        { "name": "GET /producto/categoria/:id", "request": { "method": "GET", "url": "{{base_url}}/producto/categoria/1" } },
+        { "name": "GET /producto/sin-movimientos?dias=30", "request": { "method": "GET", "url": "{{base_url}}/producto/sin-movimientos?dias=30" } },
+        { "name": "GET /producto/precio-promedio/:id_categoria", "request": { "method": "GET", "url": "{{base_url}}/producto/precio-promedio/1" } }
+      ]
+    },
+    {
+      "name": "Movimiento",
+      "item": [
+        { "name": "GET /movimiento", "request": { "method": "GET", "url": "{{base_url}}/movimiento" } },
+        {
+          "name": "POST /movimiento (entrada)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/movimiento",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"tipo\": \"entrada\",\n  \"cantidad\": 20,\n  \"id_producto\": 1\n}" },
+            "description": "Trigger trg_actualizar_stock ajusta stock."
+          }
+        },
+        {
+          "name": "POST /movimiento (salida)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/movimiento",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"tipo\": \"salida\",\n  \"cantidad\": 5,\n  \"id_producto\": 1\n}" }
+          }
+        },
+        {
+          "name": "PUT /movimiento/:id",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/movimiento/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"cantidad\": 8\n}" }
+          }
+        },
+        { "name": "DELETE /movimiento/:id", "request": { "method": "DELETE", "url": "{{base_url}}/movimiento/1" } },
+        { "name": "GET /movimiento/producto/:id", "request": { "method": "GET", "url": "{{base_url}}/movimiento/producto/1" } },
+        { "name": "GET /movimiento/invalidos", "request": { "method": "GET", "url": "{{base_url}}/movimiento/invalidos" } },
+        { "name": "GET /movimiento/count?tipo=entrada", "request": { "method": "GET", "url": "{{base_url}}/movimiento/count?tipo=entrada" } }
+      ]
+    },
+    {
+      "name": "Pedido",
+      "item": [
+        { "name": "POST /pedido/:id/procesar", "request": { "method": "POST", "url": "{{base_url}}/pedido/1/procesar" } },
+        { "name": "POST /pedido/:id/recalcular-total", "request": { "method": "POST", "url": "{{base_url}}/pedido/1/recalcular-total" } },
+        { "name": "GET /pedido/:id/detalle-completo", "request": { "method": "GET", "url": "{{base_url}}/pedido/1/detalle-completo" } },
+        { "name": "GET /pedido/codigo/nuevo", "request": { "method": "GET", "url": "{{base_url}}/pedido/codigo/nuevo" } },
+        { "name": "/pedido/cliente/:id/total-compras", "request": { "method": "GET", "url": "{{base_url}}/pedido/cliente/1/total-compras" } },
+        { "name": "GET /pedido/entrega/promedio?id_pedido=1", "request": { "method": "GET", "url": "{{base_url}}/pedido/entrega/promedio?id_pedido=1" } },
+        { "name": "GET /pedido/entrega/promedio (global)", "request": { "method": "GET", "url": "{{base_url}}/pedido/entrega/promedio" } }
+      ]
+    },
+    {
+      "name": "Inventario",
+      "item": [
+        {
+          "name": "POST /inventario/actualizar-stock",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/inventario/actualizar-stock",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id_producto\": 1,\n  \"cantidad\": 3,\n  \"tipo\": \"salida\"\n}" }
+          }
+        },
+        {
+          "name": "POST /inventario/entrada",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/inventario/entrada",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id_producto\": 1,\n  \"cantidad\": 12,\n  \"id_proveedor\": 1\n}" }
+          }
+        },
+        { "name": "GET /inventario/stock/:id_producto", "request": { "method": "GET", "url": "{{base_url}}/inventario/stock/1" } },
+        { "name": "GET /inventario/validar/:id_producto?cantidad=5", "request": { "method": "GET", "url": "{{base_url}}/inventario/validar/1?cantidad=5" } },
+        { "name": "GET /inventario/porcentaje/:id_producto", "request": { "method": "GET", "url": "{{base_url}}/inventario/porcentaje/1" } },
+        { "name": "POST /inventario/generar-alertas", "request": { "method": "POST", "url": "{{base_url}}/inventario/generar-alertas" } }
+      ]
+    },
+    {
+      "name": "Reportes",
+      "item": [
+        { "name": "GET /reportes/ventas-por-mes/:anio", "request": { "method": "GET", "url": "{{base_url}}/reportes/ventas-por-mes/2025" } },
+        { "name": "GET /reportes/total-ventas-anual/:anio", "request": { "method": "GET", "url": "{{base_url}}/reportes/total-ventas-anual/2025" } },
+        { "name": "GET /reportes/clientes-sin-pedidos?meses=6", "request": { "method": "GET", "url": "{{base_url}}/reportes/clientes-sin-pedidos?meses=6" } },
+        { "name": "GET /reportes/clientes-top?limit=10", "request": { "method": "GET", "url": "{{base_url}}/reportes/clientes-top?limit=10" } },
+        { "name": "GET /reportes/pedidos-urgentes?dias_adelante=7", "request": { "method": "GET", "url": "{{base_url}}/reportes/pedidos-urgentes?dias_adelante=7" } },
+        { "name": "GET /reportes/stock-por-categoria", "request": { "method": "GET", "url": "{{base_url}}/reportes/stock-por-categoria" } },
+        { "name": "GET /reportes/productos-sin-movimientos?dias=30", "request": { "method": "GET", "url": "{{base_url}}/reportes/productos-sin-movimientos?dias=30" } }
+      ]
+    },
+    {
+      "name": "Utilidades",
+      "item": [
+        { "name": "GET /utilidades/subtotal?cantidad=3&precio=650", "request": { "method": "GET", "url": "{{base_url}}/utilidades/subtotal?cantidad=3&precio=650" } },
+        { "name": "GET /utilidades/codigo-pedido/nuevo", "request": { "method": "GET", "url": "{{base_url}}/utilidades/codigo-pedido/nuevo" } }
+      ]
+    },
+    {
+      "name": "Auditoría",
+      "item": [
+        { "name": "GET /auditoria/cambios?days_back=30", "request": { "method": "GET", "url": "{{base_url}}/auditoria/cambios?days_back=30" } }
+      ]
+    },
+    {
+      "name": "Alertas",
+      "item": [
+        { "name": "POST /alertas/generar-stock", "request": { "method": "POST", "url": "{{base_url}}/alertas/generar-stock" } }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ]
+}

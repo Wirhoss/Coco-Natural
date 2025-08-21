@@ -89,7 +89,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_producto AS
              id_categoria = COALESCE(p_id_categoria, id_categoria),
              id_proveedor = COALESCE(p_id_proveedor, id_proveedor)
        WHERE id_producto = p_id_producto;
-      -- Sin COMMIT aquí.
    END actualizar_producto;
 
    PROCEDURE eliminar_producto (
@@ -98,7 +97,6 @@ CREATE OR REPLACE PACKAGE BODY pkg_producto AS
    BEGIN
       DELETE FROM producto
        WHERE id_producto = p_id_producto;
-      -- Sin COMMIT aquí.
    END eliminar_producto;
 
    FUNCTION obtener_productos RETURN SYS_REFCURSOR IS
